@@ -53,6 +53,11 @@ L’objectif est de démontrer votre maîtrise de Python, Celery, Redis et Postg
 | Documentation  | Clarté, instructions reproductibles                   |
 
 ---
+## Bonus (optionnels)
+
+- Système de notifications (email ou webhook) lorsque le job est terminé
+- Gestion du cache avec Redis
+- Sécuriser les endpoints
 
 ## Exemple de scénario de test rapide
 
@@ -67,10 +72,4 @@ curl http://localhost:8000/api/imports/abc123/status
 
 # Récupérer la liste des clients  
 curl http://localhost:8000/api/clients?page=1&per_page=20  
-# → { "clients": [ … ], "page":1, "total_pages":3 }  
-
-## Bonus (optionnels)
-
-- Système de notifications (email ou webhook) lorsque le job est terminé
-- Gestion du cache avec Redis
-- Sécuriser les endpoints
+# → { "clients": [ … ], "page":1, "total_pages":3 }
