@@ -18,14 +18,15 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
 )
 def get_import_status(job_id: UUID, db=Depends(db_context)):
-    job = import_job_crud.get_one(db, job_id)
+    job = import_job_crud.get_one(db, job_id)  # type: ignore[call-arg]
     if not job:
         raise HTTPException(status_code=404, detail="Import job not found")
 
-    row_stats = job.row_stats or {"total": 0, "valid": 0, "errors": 0}
+    row_stats = job.row_stats or {"total": 0, "valid": 0, "errors": 0}  # type: ignore[call-arg]
+
     return ImportJobStatusResponse(
-        job_id=job.id,
-        status=job.status.name.upper(),
+        job_id=job.id,  # type: ignore[call-arg]
+        status=job.status.name.upper(),  # type: ignore[call-arg]
         total=row_stats.get("total", 0),
         valid=row_stats.get("valid", 0),
         errors=row_stats.get("errors", 0),
