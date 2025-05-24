@@ -35,7 +35,7 @@ class-rgx=[A-Z][a-zA-Z0-9]+$
 const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
 
 [FORMAT]
-max-line-length=120
+max-line-length=88
 indent-string='    '
 ignore-long-lines=^\s*(# )?<?https?://\S+>?
 
