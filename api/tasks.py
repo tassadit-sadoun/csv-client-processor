@@ -26,7 +26,7 @@ app = Celery("tasks", broker=BROKER_URL, backend=RESULT_BACKEND)
     retry_kwargs={"max_retries": 3, "countdown": 10},
     retry_backoff=True,
 )
-def run_import_job(self, job_id: int, filepath: str):
+def run_import_job(self, job_id: int, filepath: str) -> None:
     log.info("Starting import job %d with file: %s", job_id, filepath)
 
     try:
