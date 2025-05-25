@@ -23,6 +23,7 @@ def db_context() -> Generator:
             "An error occurred while getting the database session. Error: "
             " %s", e
         )
+        raise
     finally:
         log.debug("closing database session")
         session.close()
