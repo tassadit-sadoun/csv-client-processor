@@ -1,19 +1,32 @@
-import pytest
+import io
+import pathlib
+import shutil
+from datetime import date
+from unittest.mock import patch
 from uuid import uuid4
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import date
-from unittest.mock import patch
-import pathlib
-import shutil
-import io
+from types import SimpleNamespace
 
 from main import app
 from database.base_class import Base
 from database.db import db_context
 from models import Client, ImportJob, JobStatus
+from security.auth.token_utils import verify_token
 
+
+# --- Mock authentication ---
+def fake_get_current_user():
+    return SimpleNamespace(id=1, username="testuser")
+
+
+app.dependency_overrides[verify_token] = fake_get_current_user
+
+
+# --- In-memory DB configuration for tests ---
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
@@ -98,6 +111,23 @@ def seed_import_jobs():
     db.close()
 
 
+@pytest.fixture(autouse=True)
+def cleanup_shared_dir():
+    shared_dir = pathlib.Path("/shared_data")
+    yield
+    if shared_dir.exists():
+        for f in shared_dir.iterdir():
+            try:
+                if f.is_file():
+                    f.unlink()
+                elif f.is_dir():
+                    shutil.rmtree(f)
+            except Exception as e:
+                print(f"Failed to clean up file: {f} - {e}")
+
+
+# --- Tests Clients ---
+
 def test_get_clients_success(seed_clients):
     response = client.get("/api/clients?page=1&per_page=2")
     assert response.status_code == 200
@@ -146,6 +176,8 @@ def test_get_clients_empty():
     assert data["total_pages"] == 0
 
 
+# --- Tests ImportJob ---
+
 def test_get_import_status_success(seed_import_jobs):
     job1, _ = seed_import_jobs
     response = client.get(f"/api/imports/{job1.id}/status")
@@ -170,21 +202,6 @@ def test_get_import_status_in_progress(seed_import_jobs):
     assert data["errors"] == 0
 
 
-@pytest.fixture(autouse=True)
-def cleanup_shared_dir():
-    shared_dir = pathlib.Path("/shared_data")
-    yield
-    if shared_dir.exists():
-        for f in shared_dir.iterdir():
-            try:
-                if f.is_file():
-                    f.unlink()
-                elif f.is_dir():
-                    shutil.rmtree(f)
-            except Exception as e:
-                print(f"Failed to clean up file: {f} - {e}")
-
-
 def test_get_import_status_not_found():
     fake_uuid = uuid4()
     response = client.get(f"/api/imports/{fake_uuid}/status")
@@ -193,12 +210,12 @@ def test_get_import_status_not_found():
     assert data["detail"] == "Import job not found"
 
 
-# --- Tests ---
+# --- Tests Imports POST ---
+
 @patch("routers.imports.run_import_job.delay")
 def test_import_clients_success(mock_delay):
     content = b"name,email,birth_date\nAlice,alice@example.com,1990-01-01"
     file = {"file": ("clients.csv", io.BytesIO(content), "text/csv")}
-    
     response = client.post("/api/imports", files=file)
     assert response.status_code == 200
     data = response.json()
