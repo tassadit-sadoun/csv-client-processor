@@ -220,3 +220,8 @@ csv-client-processor/
 - N'oubliez pas d’adapter les tokens JWT et les identifiants à vos propres valeurs.
 - Les migrations étant versionnées, la première application (`alembic upgrade head`) suffit pour créer toutes les tables.
 - Le fichier `.env` est inclus pour faciliter les tests locaux et garantir une exécution immédiate du projet en environnement de développement.
+
+
+## Améliorations
+
+Pour consulter les pistes d'amélioration identifiées, voir le fichier [IMPROVEMENTS.md](IMPROVEMENTS.md).
