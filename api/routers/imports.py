@@ -20,7 +20,7 @@ log = get_logger(__name__)
 def import_clients(
     file: UploadFile = File(...),
     db: Session = Depends(db_context),
-    payload: dict = Depends(verify_token)
+    _: dict = Depends(verify_token)
 ):
     shared_dir = "/shared_data"
     try:
