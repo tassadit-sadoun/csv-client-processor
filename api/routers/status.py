@@ -5,6 +5,7 @@ from crud import import_job_crud
 from database.db import db_context
 from log_config.log import get_logger
 from schemas.status import ImportJobStatusResponse
+from security.auth.token_utils import verify_token
 
 log = get_logger(__name__)
 
@@ -15,9 +16,13 @@ router = APIRouter()
 @router.get(
     "/{job_id}/status",
     response_model=ImportJobStatusResponse,
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_200_OK, 
 )
-def get_import_status(job_id: UUID, db=Depends(db_context)):
+def get_import_status(
+    job_id: UUID,
+    db=Depends(db_context),
+    _: dict = Depends(verify_token),
+):
     job = import_job_crud.get_one(db, job_id)  # type: ignore[call-arg]
     if not job:
         raise HTTPException(status_code=404, detail="Import job not found")

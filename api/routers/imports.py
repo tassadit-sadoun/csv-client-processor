@@ -9,6 +9,7 @@ from models import ImportJob, JobStatus
 from log_config.log import get_logger
 from schemas.imports import ImportJobResponse
 from tasks import run_import_job
+from security.auth.token_utils import verify_token
 
 router = APIRouter(prefix="/api/imports", tags=["imports"])
 
@@ -19,6 +20,7 @@ log = get_logger(__name__)
 def import_clients(
     file: UploadFile = File(...),
     db: Session = Depends(db_context),
+    payload: dict = Depends(verify_token)
 ):
     shared_dir = "/shared_data"
     try:
