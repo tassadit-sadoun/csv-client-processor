@@ -121,6 +121,23 @@ curl http://localhost:8000/api/imports/e559be95-fb8e-4114-b256-9ff081267f52/stat
 
 ```bash
 docker exec app_container env PYTHONPATH=/usr/src/app pytest -v tests
+  # →
+  tests/routers/test_routers.py::test_get_clients_success PASSED         [  6%]
+tests/routers/test_routers.py::test_get_clients_page_2 PASSED            [ 13%]
+tests/routers/test_routers.py::test_get_clients_page_too_high PASSED     [ 20%]
+tests/routers/test_routers.py::test_get_clients_invalid_per_page PASSED  [ 26%]
+tests/routers/test_routers.py::test_get_clients_invalid_page PASSED      [ 33%]
+tests/routers/test_routers.py::test_get_clients_empty PASSED             [ 40%]
+tests/routers/test_routers.py::test_get_import_status_success PASSED     [ 46%]
+tests/routers/test_routers.py::test_get_import_status_in_progress PASSED [ 53%]
+tests/routers/test_routers.py::test_get_import_status_not_found PASSED   [ 60%]
+tests/routers/test_routers.py::test_import_clients_success PASSED        [ 66%]
+tests/routers/test_routers.py::test_import_clients_invalid_file_save PASSED [ 73%]
+tests/routers/test_routers.py::test_import_clients_dispatch_fails PASSED [ 80%]
+tests/routers/test_routers.py::test_import_clients_missing_file PASSED   [ 86%]
+tests/test_tasks.py::test_run_import_job_success PASSED                  [ 93%]
+tests/test_tasks.py::test_run_import_job_failure_retry PASSED            [100%]
+======================== 15 passed, 8 warnings in 2.52s ========================
 ```
 
 ---
