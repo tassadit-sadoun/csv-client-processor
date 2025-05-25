@@ -17,3 +17,5 @@ starlette>=0.26
 httpx>=0.23
 pytest-cov
 coverage
+
+pyjwt
