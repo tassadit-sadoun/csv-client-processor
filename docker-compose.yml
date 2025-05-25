@@ -1,0 +1,55 @@
+services:
+  app:
+    container_name: app_container
+    build: ./api
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    volumes:
+      - ./api:/usr/src/app
+      - shared_data:/shared_data
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - redis
+      - database
+    env_file:
+      - .env
+
+  worker:
+    container_name: worker_container
+    build: ./api
+    command: celery -A tasks worker
+    volumes:
+      - ./api:/usr/src/app
+      - shared_data:/shared_data
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+      - database
+    env_file:
+      - .env
+
+  redis:
+    container_name: redis_container
+    image: redis:latest
+
+  database:
+    container_name: database_container
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  shared_data:
